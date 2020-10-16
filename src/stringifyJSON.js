@@ -21,17 +21,29 @@ var stringifyJSON = function(obj) {
   let result;
 
   if (Array.isArray(obj)) {
-    // do something
-    result = [];
-    return '['+ result + ']';
-
-  } else { // may need to add check for object
-    // do something
     result = [];
 
+    for (let i = 0; i < obj.length; i++) {
+      if (!valueIsValid(obj[i])) {
+        result.push('null');
+      } else {
+        result.push(stringifyJSON(obj[i]));
+      }
+    }
+
+    return '[' + result + ']';
+
+  } else {
+    result = [];
+    for (var key in obj) {
+      if (!valueIsValid(obj[key])) {
+        continue;
+      } else {
+        result.push(stringifyJSON(key) + ':' + stringifyJSON(obj[key]));
+      }
+    }
     return '{' + result + '}';
   }
-
 };
 
 var stringTheValue = function(value) {
@@ -43,19 +55,19 @@ var stringTheValue = function(value) {
     return value + '';
   } else if (typeof value === 'function') {
     return undefined;
-  } else if (typeof valiue === 'undefined') {
+  } else if (typeof value === 'undefined') {
     return undefined;
-  } else if (typeof value === null) {
+  } else if (!value) {
     return 'null';
   }
-}
+};
 
 var valueIsValid = function(value) {
   // var isValid = false;
 
   var isAFunction = typeof value === 'function';
   var isASymbol = typeof value === 'symbol';
-  var isAnObject = typeof value === 'object';
+  var isUnd = typeof value === 'undefined';
 
-  return !isAFunction && !isASymbol && !isAnObject
-}
+  return !isAFunction && !isASymbol && !isUnd;
+};
