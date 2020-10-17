@@ -72,6 +72,8 @@ var parseJSON = function(json) {
     return parseBoolean(nextChar);
   } else if (nextChar === 'n') {
     return parseNull();
+  } if (nextChar === ',') {
+    parseJSON(getNextChar(json));
   }
 
   // helper functions for types -----------------------------
@@ -116,5 +118,18 @@ var parseJSON = function(json) {
       return null;
     }
   };
+
+  var parseArray = function (char) {
+    var result = [];
+
+    if (char === ']') {
+      return [];
+    }
+
+    var element = parseJSON(getNextChar(json));
+    result.push(element);
+
+    return result;
+  }
 
 };
