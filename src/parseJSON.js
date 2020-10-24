@@ -58,7 +58,7 @@ var parseJSON = function(json, nthCall) {
     if (index > json.length) {
       throw new SyntaxError;
     }
-    if (json[index] === ' ' && !withinString) {
+    if ((json[index] === ' ' || json[index] === '\r' || json[index] === '\n' || json[index] === '\t') && !withinString) {
       return getNextChar(json);
     }
 
@@ -68,6 +68,14 @@ var parseJSON = function(json, nthCall) {
   // helper functions for types -----------------------------
 
   var parseString = function(char) {
+    if (char === '\\' && json[index - 1] !== '\\') {
+      return parseString(getNextChar(json, true));
+    } else if (char === '\\' && json[index - 1] === '\\') {
+      index++;
+    } else if ((char === 'r' || char === 'r') && json[index - 1] === '\\') {
+      index++;
+    }
+
     if (char === '"' && json[index - 1] !== '\\') {
       return '';
     }
@@ -160,7 +168,7 @@ var parseJSON = function(json, nthCall) {
   var nextChar = getNextChar(json);
 
   if (nextChar === '"') {
-    return parseString(getNextChar(json));
+    return parseString(getNextChar(json)).toString();
   } else if (nextChar.charCodeAt() >= 48 && nextChar.charCodeAt() <= 57) {
     return Number(parseNumber(nextChar));
   } else if (nextChar === '-') {
@@ -179,7 +187,7 @@ var parseJSON = function(json, nthCall) {
   } else if (nextChar === '\\') {
     return parseJSON(nextChar, true);
   } else {
-    return parseJSON(nextChar, true);
+    return parseJSON(json, true);
   }
 
 };
